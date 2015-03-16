@@ -77,3 +77,10 @@ class PF_Stats {
 
 	}
 }
+
+function pressforward_stats(){
+
+	return PF_Stats::init();
+
+}
+add_action( 'pressforward_init', 'pressforward_stats' );
