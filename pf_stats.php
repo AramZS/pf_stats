@@ -1,4 +1,26 @@
 <?php
+/*
+Plugin Name: PressForward Stats
+Plugin URI: http://pressforward.org/
+Description: A plugin that generates shortcodes to calculate stats about use of the PressForward plugin.
+Version: 0.0.1
+GitHub Plugin URI: https://github.com/PressForward/pressforward
+Author: Aram Zucker-Scharff, Boone B Gorges, Jeremy Boggs
+Author URI: http://pressforward.org/about/team/
+License: GPL2
+*/
+/*  Developed for the Roy Rosenzweig Center for History and New Media
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License, version 2, as
+    published by the Free Software Foundation.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 class PF_Stats {
 
@@ -29,6 +51,8 @@ class PF_Stats {
 
 		$this->base();
 
+		$this->includes();
+
 		$this->access();
 
 		$this->shortcodes();
@@ -44,13 +68,14 @@ class PF_Stats {
 		$this->ver = 1.0;
 		$this->feed_post_type = 'pf_feed_item';
 		$this->meta_key = 'item_id';
+		$this->meta_author_key = 'item_author';
 
 	}
 
 	private function includes(){
 
-		require_once( $this->root . '/lib/gender-checker/src/GenderEngine.php' );
-		require_once( $this->root . '/lib/text-stats/text-stats/src/DaveChild/TextStatistics/TextStatistics.php' )
+		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/GenderEngine.php' );
+		require_once( $this->root . '/lib/text-stats/src/DaveChild/TextStatistics/TextStatistics.php' );
 		require_once( $this->root . '/includes/shortcodes.php' );
 
 	}
@@ -71,7 +96,7 @@ class PF_Stats {
 
 		if ( empty( $this->shortcodes ) ) {
 
-			$this->shortcodes = new PF_Stat_Shortcodes;
+			$this->shortcodes = PF_Stats_Shortcodes::init();
 
 		}
 
