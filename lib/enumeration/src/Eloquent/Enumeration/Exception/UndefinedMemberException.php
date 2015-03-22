@@ -3,7 +3,7 @@
 /*
  * This file is part of the Enumeration package.
  *
- * Copyright © 2014 Erin Millard
+ * Copyright © 2013 Erin Millard
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,34 +12,38 @@
 namespace Eloquent\Enumeration\Exception;
 
 use Exception;
+use LogicException;
 
 /**
- * An abstract base class for implementing undefined member exceptions.
+ * The requested member was not found.
  */
-abstract class AbstractUndefinedMemberException extends Exception implements
+final class UndefinedMemberException extends LogicException implements
     UndefinedMemberExceptionInterface
 {
     /**
      * Construct a new undefined member exception.
      *
-     * @param string         $message   The exception message.
-     * @param string         $className The name of the class from which the member was requested.
-     * @param string         $property  The name of the property used to search for the member.
-     * @param mixed          $value     The value of the property used to search for the member.
-     * @param Exception|null $cause     The cause, if available.
+     * @param string    $className The name of the class from which the member was requested.
+     * @param string    $property  The name of the property used to search for the member.
+     * @param mixed     $value     The value of the property used to search for the member.
+     * @param Exception $previous  The cause, if available.
      */
-    public function __construct(
-        $message,
-        $className,
-        $property,
-        $value,
-        Exception $cause = null
-    ) {
+    public function __construct($className, $property, $value, Exception $previous = null)
+    {
         $this->className = $className;
         $this->property = $property;
         $this->value = $value;
 
-        parent::__construct($message, 0, $cause);
+        parent::__construct(
+            sprintf(
+                "No member with %s equal to %s defined in class '%s'.",
+                $this->property(),
+                var_export($this->value(), true),
+                $this->className()
+            ),
+            0,
+            $previous
+        );
     }
 
     /**
