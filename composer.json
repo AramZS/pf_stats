@@ -15,11 +15,11 @@
         "php": ">=5.3"
     },
     "require-dev": {
-        "icecave/archer": "~1"
+        "icecave/archer": "1.0.0-alpha.2"
     },
     "autoload": {
-        "psr-4": {
-            "Eloquent\\Enumeration\\": "src"
+        "psr-0": {
+            "Eloquent\\Enumeration": "src"
         }
     }
 }
