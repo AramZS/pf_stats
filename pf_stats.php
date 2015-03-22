@@ -36,6 +36,7 @@ class PF_Stats {
 	var $base;
 	var $access;
 	var $shortcodes;
+	var $gender_checker;
 
 	public static function init() {
 		static $instance;
@@ -56,6 +57,9 @@ class PF_Stats {
 		$this->access();
 
 		$this->shortcodes();
+
+		$this->gender_checker();
+
 	}
 
 	private function define_constants(){
@@ -74,6 +78,7 @@ class PF_Stats {
 
 	private function includes(){
 
+		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/Gender.php' );
 		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/GenderEngine.php' );
 		require_once( $this->root . '/lib/text-stats/src/DaveChild/TextStatistics/TextStatistics.php' );
 		require_once( $this->root . '/includes/shortcodes.php' );
@@ -100,6 +105,14 @@ class PF_Stats {
 
 		}
 
+	}
+
+	public function gender_checker(){
+		if (empty( $this->gender_checker ) ) {
+
+			$this->gender_checker = new GenderEngine\GenderEngine();
+
+		}
 	}
 }
 

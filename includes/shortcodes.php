@@ -143,7 +143,12 @@ class PF_Stats_Shortcodes {
 	}
 
 	private function add_author_leaderboard_entry($author){
-		return $s = "\n<li>" . $author['name'] . ' (' . $author['count'] . ')</li>';
+		
+		$s = "\n<li>";
+		$s .= $author['name'] . ' (' . $author['count'] . ')';
+		$s .= ' This author is likely '. pressforward_stats()->gender_checker->test($author['name']) . ' with a confidence of ' . pressforward_stats()->gender_checker->getPreviousMatachConfidence();
+		$s .= '</li>';
+		return $s;
 	}
 
 	public function the_shortcode($code, $args){
