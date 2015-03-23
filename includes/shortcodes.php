@@ -134,7 +134,7 @@ class PF_Stats_Shortcodes {
 		$leaderboard .= '</ul>';
 		$more_than_one = $count - $singles;
 		$leaderboard = "<p>$count authors over $total articles. $singles authors archived only once. $more_than_one authors archived more than once. $more_than_two authors archived more than twice.</p>\n
-			<p>$female authors are probably female, writing $article_count_female articles. $male authors are probably male, writing $article_count_female articles. $unknown number of authors can't have their gender algorithmically determined, writing $article_count_unknown articles.</p>
+			<p>$female authors are probably female, writing $article_count_female articles. $male authors are probably male, writing $article_count_male articles. $unknown number of authors can't have their gender algorithmically determined, writing $article_count_unknown articles.</p>
 			\n" . $leaderboard;
 		return $leaderboard;
 	}
