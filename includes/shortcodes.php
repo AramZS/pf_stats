@@ -143,10 +143,32 @@ class PF_Stats_Shortcodes {
 	}
 
 	private function add_author_leaderboard_entry($author){
-		
+		if ( empty($author) ) {
+			$author = array();
+			$author['count'] = 0;
+		}
+		if ( ( empty($author['name']) ) ) {
+			$author['name'] = 'No author found.';
+		}
 		$s = "\n<li>";
 		$s .= $author['name'] . ' (' . $author['count'] . ')';
-		$s .= ' This author is likely '. pressforward_stats()->gender_checker->test($author['name']) . ' with a confidence of ' . pressforward_stats()->gender_checker->getPreviousMatachConfidence();
+		#var_dump(pressforward_stats()->gender_checker->test($author['name']) ); var_dump( pressforward_stats()->gender_checker->getPreviousMatchConfidence() ); die();
+		$author_name = (string) $author['name'];
+		$author_first_name_array = explode( ' ', $author_name );
+		$author_first_name = (string) $author_first_name_array[0];
+		if ( empty($author_first_name) ) {
+			if ( empty( $author_name ) ){
+				$author_first_name = "No author found.";
+			} else {
+				$author_first_name = $author_name;
+			}
+		}
+		//var_dump($author_first_name . ': ');
+		$gender = pressforward_stats()->gender_checker->test($author_first_name);
+		//var_dump($gender . "\n");
+		$confidence = pressforward_stats()->gender_checker->getPreviousMatchConfidence();
+		$confidence = (string) $confidence;
+		$s .= ' This author is likely '. $gender . '. Confidence: ' . $confidence;
 		$s .= '</li>';
 		return $s;
 	}

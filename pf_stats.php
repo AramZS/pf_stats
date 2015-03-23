@@ -78,7 +78,23 @@ class PF_Stats {
 
 	private function includes(){
 
+		require_once( $this->root . '/lib/enumeration/src/Eloquent/Enumeration/Multiton.php' );
+		require_once( $this->root . '/lib/enumeration/src/Eloquent/Enumeration/Enumeration.php' );
+
+		
 		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/Gender.php' );
+		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/Matchers/Traits/NameList.php' );
+		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/Matchers/Interfaces/Matcher.php' );
+
+		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/Matchers/BabyNamesWSMatch.php' );
+		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/Matchers/RestNamesWSMatch.php' );
+		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/Matchers/RegExpV1Match.php' );
+		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/Matchers/RegExpV2Match.php' );
+		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/Matchers/MetaphoneWeightedMatch.php' );
+		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/Matchers/MetaphoneMatch.php' );
+		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/Matchers/ListWeightedMatch.php' );
+		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/Matchers/ListMatch.php' );
+
 		require_once( $this->root . '/lib/gender-checker/src/GenderEngine/GenderEngine.php' );
 		require_once( $this->root . '/lib/text-stats/src/DaveChild/TextStatistics/TextStatistics.php' );
 		require_once( $this->root . '/includes/shortcodes.php' );
