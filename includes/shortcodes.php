@@ -101,6 +101,9 @@ class PF_Stats_Shortcodes {
 		$male = 0;
 		$female = 0;
 		$unknown = 0;
+		$article_count_male = 0;
+		$article_count_female = 0;
+		$article_count_unknown = 0;
 		$more_than_two = 0;
 		$leaderboard = '<ul>';
 		foreach ( $authors as $author ){
@@ -114,12 +117,15 @@ class PF_Stats_Shortcodes {
 			if ( !empty( $author['gender'] ) ){
 				if ( 'MALE' == $author['gender'] ){
 					$male++;
+					$article_count_male += $author['count'];
 				}
 				if ( 'FEMALE' == $author['gender'] ){
 					$female++;
+					$article_count_female += $author['count'];
 				}
 				if ( 'UNKNOWN' == $author['gender'] ) {
 					$unknown++;
+					$article_count_unknown += $author['count'];
 				}
 			}
 			$leaderboard .= $this->add_author_leaderboard_entry($author);
@@ -128,7 +134,7 @@ class PF_Stats_Shortcodes {
 		$leaderboard .= '</ul>';
 		$more_than_one = $count - $singles;
 		$leaderboard = "<p>$count authors over $total articles. $singles authors archived only once. $more_than_one authors archived more than once. $more_than_two authors archived more than twice.</p>\n
-			<p>$female authors are probably female. $male authors are probably male. $unknown number of authors can't have their gender algorithmically determined.</p>
+			<p>$female authors are probably female, writing $article_count_female articles. $male authors are probably male, writing $article_count_female articles. $unknown number of authors can't have their gender algorithmically determined, writing $article_count_unknown articles.</p>
 			\n" . $leaderboard;
 		return $leaderboard;
 	}
