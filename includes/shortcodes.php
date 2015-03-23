@@ -98,6 +98,9 @@ class PF_Stats_Shortcodes {
 		$total = 0;
 		$count = 0;
 		$singles = 0;
+		$male = 0;
+		$female = 0;
+		$unknown = 0;
 		$more_than_two = 0;
 		$leaderboard = '<ul>';
 		foreach ( $authors as $author ){
@@ -108,12 +111,25 @@ class PF_Stats_Shortcodes {
 			if ($author['count'] > 2){
 				$more_than_two++;
 			}
+			if ( !empty( $author['gender'] ) ){
+				if ( 'MALE' == $author['gender'] ){
+					$male++;
+				}
+				if ( 'FEMALE' == $author['gender'] ){
+					$female++;
+				}
+				if ( 'UNKNOWN' == $author['gender'] ) {
+					$unknown++;
+				}
+			}
 			$leaderboard .= $this->add_author_leaderboard_entry($author);
 			$count++;
 		}
 		$leaderboard .= '</ul>';
 		$more_than_one = $count - $singles;
-		$leaderboard = "<p>$count authors over $total articles. $singles authors archived only once. $more_than_one authors archived more than once. $more_than_two authors archived more than twice.</p>\n" . $leaderboard;
+		$leaderboard = "<p>$count authors over $total articles. $singles authors archived only once. $more_than_one authors archived more than once. $more_than_two authors archived more than twice.</p>\n
+			<p>$female authors are probably female. $male authors are probably male. $unknown number of authors can't have their gender algorithmically determined.</p>
+			\n" . $leaderboard;
 		return $leaderboard;
 	}
 
@@ -134,11 +150,40 @@ class PF_Stats_Shortcodes {
 		return $authors;
 	}
 
+	private function set_author_gender( $name ) {
+		$author_name = (string) $name;
+		$author_first_name_array = explode( ' ', $author_name );
+		$author_first_name = (string) $author_first_name_array[0];
+		if ( empty($author_first_name) ) {
+			if ( empty( $author_name ) ){
+				$author_first_name = "No author found.";
+			} else {
+				$author_first_name = $name;
+			}
+		}
+		//var_dump($author_first_name . ': ');
+		$gender = pressforward_stats()->gender_checker->test($author_first_name);
+		return $gender;
+	}
+
+	private function set_author_gender_confidence(){
+		//var_dump($gender . "\n");
+		$confidence = pressforward_stats()->gender_checker->getPreviousMatchConfidence();
+		$confidence = (string) $confidence;
+		return $confidence;
+
+	}
+
 	private function set_new_author_object( $author_slug, $author, $authors ){
 		$authors[$author_slug] = array( 
-										'count' => 1,
-										'name'	=> $author
+										'count' 			=> 1,
+										'name'				=> $author,
+										'gender'			=> $this->set_author_gender($author),
+										'gender_confidence'	=> $this->set_author_gender_confidence()
 									);
+
+
+
 		return $authors;
 	}
 
@@ -153,22 +198,8 @@ class PF_Stats_Shortcodes {
 		$s = "\n<li>";
 		$s .= $author['name'] . ' (' . $author['count'] . ')';
 		#var_dump(pressforward_stats()->gender_checker->test($author['name']) ); var_dump( pressforward_stats()->gender_checker->getPreviousMatchConfidence() ); die();
-		$author_name = (string) $author['name'];
-		$author_first_name_array = explode( ' ', $author_name );
-		$author_first_name = (string) $author_first_name_array[0];
-		if ( empty($author_first_name) ) {
-			if ( empty( $author_name ) ){
-				$author_first_name = "No author found.";
-			} else {
-				$author_first_name = $author_name;
-			}
-		}
-		//var_dump($author_first_name . ': ');
-		$gender = pressforward_stats()->gender_checker->test($author_first_name);
-		//var_dump($gender . "\n");
-		$confidence = pressforward_stats()->gender_checker->getPreviousMatchConfidence();
-		$confidence = (string) $confidence;
-		$s .= ' This author is likely '. $gender . '. Confidence: ' . $confidence;
+
+		$s .= ' This author is likely '. $author['gender'] . '. Confidence: ' . $author['gender_confidence'];
 		$s .= '</li>';
 		return $s;
 	}
