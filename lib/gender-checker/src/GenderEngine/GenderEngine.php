@@ -27,8 +27,8 @@ class GenderEngine
         'MetaphoneWeightedMatch',
         'RegExpV2Match',
         'RegExpV1Match',
-        'RestNamesWSMatch',
-        'BabyNamesWSMatch'
+//        'RestNamesWSMatch',
+//        'BabyNamesWSMatch'
     );
 
     public function __construct(
