@@ -57,34 +57,36 @@ class PF_Stats_Shortcodes {
 	}
 
 	public function author_leaderboard(){
-		$c = 0;
-		$the_query = new WP_Query(
-			array(
-				'nopaging' => true,
-				'posts_per_page' => -1,
-				'meta_key' => pressforward_stats()->meta_author_key,
-			)
-		);
+		if ( false === ( $s = get_transient( 'pf_author_leaderboard_transient' ) ) ) {
+			$c = 0;
+			$the_query = new WP_Query(
+				array(
+					'nopaging' => true,
+					'posts_per_page' => -1,
+					'meta_key' => pressforward_stats()->meta_author_key,
+				)
+			);
 
-		$authors = array();
+			$authors = array();
 
-		if ( $the_query->have_posts() ) :
+			if ( $the_query->have_posts() ) :
 
-			while ( $the_query->have_posts() ) : $the_query->the_post();
-				$authors = $this->set_author_into_leaderboard( get_the_ID(), $authors );
-				$c++;
-			endwhile;
+				while ( $the_query->have_posts() ) : $the_query->the_post();
+					$authors = $this->set_author_into_leaderboard( get_the_ID(), $authors );
+					$c++;
+				endwhile;
 
-			wp_reset_postdata();
+				wp_reset_postdata();
 
-			$s = $this->the_shortcode( 'pf_author_leaderboard', array( 'authors' => $authors ) );
+				$s = $this->the_shortcode( 'pf_author_leaderboard', array( 'authors' => $authors ) );
 
-		else :
+			else :
 
-			$s = $this->the_shortcode( 'read_nothing', array( 'days' => '30' ) );
+				$s = $this->the_shortcode( 'read_nothing', array( 'days' => '30' ) );
 
-		endif;
-
+			endif;
+			set_transient( 'pf_author_leaderboard_transient', $s, 7 * DAY_IN_SECONDS );
+		}
 		return $s;
 
 	}
@@ -181,7 +183,7 @@ class PF_Stats_Shortcodes {
 	}
 
 	private function set_new_author_object( $author_slug, $author, $authors ){
-		$authors[$author_slug] = array( 
+		$authors[$author_slug] = array(
 										'count' 			=> 1,
 										'name'				=> $author,
 										'gender'			=> $this->set_author_gender($author),
