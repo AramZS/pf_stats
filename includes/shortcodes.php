@@ -15,49 +15,91 @@ class PF_Stats_Shortcodes {
 	private function __construct() {
 
 		add_shortcode( 'pf_wordcount_last_thirty', array( $this, 'pf_wordcount_last_thirty' ) );
+		add_shortcode( 'pf_wordcount_all', array( $this, 'pf_wordcount_all' ) );
 		add_shortcode( 'pf_author_leaderboard', array( $this, 'author_leaderboard' ) );
 
 	}
 
-	// Add Shortcode
-	public function pf_wordcount_last_thirty() {
+	public function pf_wordcount_all() {
+		if ($s = $this->check_pf_transient('wc_all')){
 			$wc = 0;
 			$c = 0;
+			$the_query = new WP_Query(
+				array(
+					'meta_key' => pressforward_stats()->meta_key,
+					'posts_per_page' => -1,
+
+				)
+			);
+			if ( $the_query->have_posts() ) :
+
+					while ( $the_query->have_posts() ) : $the_query->the_post();
+						$content = get_post_field( 'post_content', get_the_ID() );
+						$word_count = str_word_count( strip_tags( $content ) );
+						$wc = $wc+$word_count;
+						$c++;
+					endwhile;
+
+				wp_reset_postdata();
+
+				$s = $this->the_shortcode( 'pf_wordcount_all', array( 'word_count' => $wc, 'count' => $c, 'days' => 'all' ) );
+
+			else :
+
+				$s = $this->the_shortcode( 'read_nothing', array( 'days' => '30' ) );
+
+			endif;
+			$this->set_pf_transient('wc_all', $s);
+		}
+		return $s;
+	}
+
+	// Add Shortcode
+	public function pf_wordcount_last_thirty() {
+		if ( $s = $this->check_pf_transient('last_30') ) {
+			$wc = 0;
+			$c = 0;
+			$week = date( 'W' );
+			$year = date( 'Y' );
 			$the_query = new WP_Query(
 				array(
 					'nopaging' => true,
 					'meta_key' => pressforward_stats()->meta_key,
 					'date_query' => array(
-						'column' => 'post_date_gmt',
-						'after'  => '30 days ago',
+						array(
+							'after' =>	'-2 months'
+						)
 					)
 
 				)
 			);
-		if ( $the_query->have_posts() ) :
+			//var_dump($the_query);
+			if ( $the_query->have_posts() ) :
 
-				while ( $the_query->have_posts() ) : $the_query->the_post();
-					$content = get_post_field( 'post_content', get_the_ID() );
-					$word_count = str_word_count( strip_tags( $content ) );
-					$wc = $wc+$word_count;
-					$c++;
-				endwhile;
+					while ( $the_query->have_posts() ) : $the_query->the_post();
+						$content = get_post_field( 'post_content', get_the_ID() );
+						$word_count = str_word_count( strip_tags( $content ) );
+						$wc = $wc+$word_count;
+						$c++;
+					endwhile;
 
-			wp_reset_postdata();
+				wp_reset_postdata();
 
-			$s = $this->the_shortcode( 'pf_wordcount_last_thirty', array( 'word_count' => $wc, 'count' => $c, 'days' => '30' ) );
+				$s = $this->the_shortcode( 'pf_wordcount_last_thirty', array( 'word_count' => $wc, 'count' => $c, 'days' => '30' ) );
 
-		else :
+			else :
 
-			$s = $this->the_shortcode( 'read_nothing', array( 'days' => '30' ) );
+				$s = $this->the_shortcode( 'read_nothing', array( 'days' => '30' ) );
 
-		endif;
+			endif;
 
+			$this->set_pf_transient('last_30', $s);
+		}
 		return $s;
 	}
 
 	public function author_leaderboard(){
-		if ( false === ( $s = get_transient( 'pf_author_leaderboard_transient' ) ) ) {
+		if ( $s = $this->check_pf_transient('author_leader') ){
 			$c = 0;
 			$the_query = new WP_Query(
 				array(
@@ -85,7 +127,8 @@ class PF_Stats_Shortcodes {
 				$s = $this->the_shortcode( 'read_nothing', array( 'days' => '30' ) );
 
 			endif;
-			set_transient( 'pf_author_leaderboard_transient', $s, 7 * DAY_IN_SECONDS );
+
+			$this->set_pf_transient('author_leader', $s);
 		}
 		return $s;
 
@@ -218,17 +261,36 @@ class PF_Stats_Shortcodes {
 			case 'pf_wordcount_last_thirty':
 				$s = sprintf( __("I've read %s words across %s posts in the past %s days.", 'pf' ), $args['word_count'], $args['count'], $args['days'] );
 				break;
+			case 'pf_wordcount_all':
+				$s = sprintf( __("I've read %s words across %s posts in %s time.", 'pf' ), $args['word_count'], $args['count'], $args['days'] );
+				break;
 			case 'pf_author_leaderboard':
 				$s = $this->get_author_leaderboard($args['authors']);
 				return $s;
 				break;
-			case 'not_30':
+			case 'read_nothing':
 				$s = sprintf( __( 'I\'ve read nothing in the past %s days.', 'pf' ), $args['days'] );
 				break;
 		}
-
 		return '<p>' . $s  . '</p>';
 
+	}
+
+	private function check_pf_transient($key){
+		if ( WP_DEBUG || (false === ( $value = get_transient( 'pf_stats_'.$key ) ) ) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private function set_pf_transient($key, $value, $time = false ) {
+		$time = ( false == $time ? (7 * DAY_IN_SECONDS) : $time );
+		if ( !WP_DEBUG ) {
+			return set_transient( 'pf_stats_'.$key, $value, $time );
+		} else {
+			return false;
+		}
 	}
 
 }
