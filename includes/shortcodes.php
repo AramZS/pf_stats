@@ -26,8 +26,11 @@ class PF_Stats_Shortcodes {
 			$c = 0;
 			$the_query = new WP_Query(
 				array(
+//					'post_type' => 'pf_feed_item',
 					'meta_key' => pressforward_stats()->meta_key,
 					'posts_per_page' => -1,
+					'no_found_rows' => true,
+					'cache_results' => false
 
 				)
 			);
@@ -63,7 +66,10 @@ class PF_Stats_Shortcodes {
 			$year = date( 'Y' );
 			$the_query = new WP_Query(
 				array(
+//					'post_type' => 'pf_feed_item',
 					'nopaging' => true,
+					'no_found_rows' => true,
+					'cache_results' => false,
 					'meta_key' => pressforward_stats()->meta_key,
 					'date_query' => array(
 						array(
@@ -103,7 +109,10 @@ class PF_Stats_Shortcodes {
 			$c = 0;
 			$the_query = new WP_Query(
 				array(
+//					'post_type' => 'pf_feed_item',
 					'nopaging' => true,
+					'no_found_rows' => true,
+					'cache_results' => false,
 					'posts_per_page' => -1,
 					'meta_key' => pressforward_stats()->meta_author_key,
 				)
