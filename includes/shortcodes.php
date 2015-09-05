@@ -143,11 +143,11 @@ class PF_Stats_Shortcodes {
 
 	}
 
-	private function cmp_authors($a, $b){
+	function cmp_authors($a, $b){
 		return $b['count'] - $a['count'];
 	}
 
-	private function get_author_leaderboard($authors){
+	function get_author_leaderboard($authors){
 		uasort($authors, array( $this, 'cmp_authors' ) );
 		$total = 0;
 		$count = 0;
@@ -192,8 +192,19 @@ class PF_Stats_Shortcodes {
 			\n" . $leaderboard;
 		return $leaderboard;
 	}
+	
+	function set_source_leaderboard($id, $array){
+		$item_link = get_post_meta($id, 'item_link');
+		$url_parts = parse_url($item_link);
+		if (!empty($array[$url_parts['host']])){
+			$array[$url_parts['host']] = $array[$url_parts['host']]+1;
+		} else {
+			$array[$url_parts['host']] = 1;
+		}
+		return $array;
+	}
 
-	private function set_author_into_leaderboard( $id, $authors ){
+	function set_author_into_leaderboard( $id, $authors ){
 		$author = pf_get_post_meta( $id, pressforward_stats()->meta_author_key );
 		$author_slug = str_replace(' ', '_', strtolower($author) );
 		if ( !empty( $authors[$author_slug] ) ) {
@@ -205,12 +216,12 @@ class PF_Stats_Shortcodes {
 		return $authors;
 	}
 
-	private function set_author_count( $author_slug, $authors ){
+	function set_author_count( $author_slug, $authors ){
 		$authors[$author_slug]['count'] = $authors[$author_slug]['count']+1;
 		return $authors;
 	}
 
-	private function set_author_gender( $name ) {
+	function set_author_gender( $name ) {
 		$author_name = (string) $name;
 		$author_first_name_array = explode( ' ', $author_name );
 		$author_first_name = (string) $author_first_name_array[0];
@@ -226,7 +237,7 @@ class PF_Stats_Shortcodes {
 		return $gender;
 	}
 
-	private function set_author_gender_confidence(){
+	function set_author_gender_confidence(){
 		//var_dump($gender . "\n");
 		$confidence = pressforward_stats()->gender_checker->getPreviousMatchConfidence();
 		$confidence = (string) $confidence;
@@ -234,7 +245,7 @@ class PF_Stats_Shortcodes {
 
 	}
 
-	private function set_new_author_object( $author_slug, $author, $authors ){
+	function set_new_author_object( $author_slug, $author, $authors ){
 		$authors[$author_slug] = array(
 										'count' 			=> 1,
 										'name'				=> $author,
@@ -247,7 +258,7 @@ class PF_Stats_Shortcodes {
 		return $authors;
 	}
 
-	private function add_author_leaderboard_entry($author){
+	function add_author_leaderboard_entry($author){
 		if ( empty($author) ) {
 			$author = array();
 			$author['count'] = 0;
@@ -285,7 +296,7 @@ class PF_Stats_Shortcodes {
 
 	}
 
-	private function check_pf_transient($key){
+	function check_pf_transient($key){
 		if ( WP_DEBUG || (false === ( $value = get_transient( 'pf_stats_'.$key ) ) ) ) {
 			return true;
 		} else {
@@ -293,7 +304,7 @@ class PF_Stats_Shortcodes {
 		}
 	}
 
-	private function set_pf_transient($key, $value, $time = false ) {
+	function set_pf_transient($key, $value, $time = false ) {
 		$time = ( false == $time ? (7 * DAY_IN_SECONDS) : $time );
 		if ( !WP_DEBUG ) {
 			return set_transient( 'pf_stats_'.$key, $value, $time );
